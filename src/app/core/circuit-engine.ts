@@ -133,7 +133,9 @@ export class CircuitEngine {
   addGate(kind: GateKind, x = 180, y = 140, label?: string, inputs?: number): dia.Element {
     const count = inputs ?? defaultInputs(kind);
     const el = new shapes.standard.Path();
-    el.resize(kind === 'IC' || kind === 'FF' ? 110 : 96, kind === 'NOT' || kind === 'BUF' ? 56 : 64);
+    const height =
+      kind === 'NOT' || kind === 'BUF' ? 56 : kind === 'IC' || kind === 'FF' ? 64 : Math.max(64, 28 + count * 18);
+    el.resize(kind === 'IC' || kind === 'FF' ? 110 : 96, height);
     el.position(x, y);
     el.attr({
       body: {
@@ -183,6 +185,7 @@ export class CircuitEngine {
       link.target({ id: target.id, port: wire.toPort ?? firstFreeIn(target, this.graph) });
       this.graph.addCell(link);
     }
+    this.paper.once('render:done', () => this.fit());
     queueMicrotask(() => this.fit());
   }
 

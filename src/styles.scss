@@ -524,6 +524,31 @@ h3,
   font-family: 'IBM Plex Mono', monospace;
 }
 
+.kmap-circuit {
+  display: flex;
+  flex-direction: column;
+  min-height: 520px;
+}
+
+.kmap-circuit .joint-host {
+  min-height: 460px;
+}
+
+.lab-help-btn.active {
+  color: #042f2e;
+  background: var(--lab-accent);
+  border-color: var(--lab-accent);
+}
+
+.chip.on {
+  border-color: #16a34a;
+  color: #166534;
+}
+
+[data-bs-theme='dark'] .chip.on {
+  color: #86efac;
+}
+
 .clock-panel {
   padding: 1rem 1rem 0;
   display: grid;

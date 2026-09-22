@@ -100,7 +100,9 @@ export const MENU_HELP: MenuHelp[] = [
       'Selecciona el número de variables (2 a 6).',
       'Clic en una celda para ciclar 0 → 1 → X (don’t care).',
       'Usa Todo 0, Todo 1 o Don’t care para rellenar el mapa.',
-      'Lee la expresión SOP/POS y los implicantes primos esenciales.',
+      'Lee la expresión SOP/POS, los implicantes primos y el circuito IEEE del resultado.',
+      'Cambia entre SOP y POS para diagramar sumas de productos o productos de sumas.',
+      'Clic en las entradas A, B, C… del lienzo para simular la salida Y.',
     ],
   },
   {

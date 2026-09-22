@@ -1,5 +1,25 @@
-import { Component, computed, signal } from '@angular/core';
-import { buildLayout, cycleCell, minimize, VAR_NAMES, type KMapLayout } from '../../core/kmap';
+import {
+  afterNextRender,
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  ElementRef,
+  inject,
+  signal,
+  untracked,
+  viewChild,
+} from '@angular/core';
+import {
+  buildLayout,
+  cycleCell,
+  diagramMinimized,
+  minimize,
+  VAR_NAMES,
+  type KMapForm,
+  type KMapLayout,
+} from '../../core/kmap';
+import { CircuitEngine } from '../../core/circuit-engine';
 import type { CellValue } from '../../core/models';
 
 @Component({
@@ -19,8 +39,8 @@ import type { CellValue } from '../../core/models';
           <div class="col-md-6">
             <label class="form-label">Clic en celda: 0 → 1 → X</label>
             <div class="d-flex gap-2 flex-wrap">
-              <button class="btn btn-sm btn-outline-light" (click)="fill(0)">Todo 0</button>
-              <button class="btn btn-sm btn-outline-light" (click)="fill(1)">Todo 1</button>
+              <button class="btn btn-sm lab-help-btn" (click)="fill(0)">Todo 0</button>
+              <button class="btn btn-sm lab-help-btn" (click)="fill(1)">Todo 1</button>
               <button class="btn btn-sm btn-outline-warning" (click)="fill('X')">Don’t care</button>
             </div>
           </div>
@@ -79,15 +99,53 @@ import type { CellValue } from '../../core/models';
           </div>
         }
       </section>
+
+      <section class="card lab-card p-0 mt-3 kmap-circuit">
+        <div class="canvas-toolbar">
+          <div>
+            <h3 class="h6 mb-1">Circuito del resultado</h3>
+            <p class="small text-secondary mb-0">
+              {{ form() === 'sop' ? result().sop : result().pos }}
+              · Clic en las entradas para simular Y
+            </p>
+          </div>
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <div class="btn-group btn-group-sm">
+              <button type="button" class="btn lab-help-btn" [class.active]="form() === 'sop'" (click)="setForm('sop')">
+                SOP
+              </button>
+              <button type="button" class="btn lab-help-btn" [class.active]="form() === 'pos'" (click)="setForm('pos')">
+                POS
+              </button>
+            </div>
+            <div class="btn-group btn-group-sm">
+              <button type="button" class="btn lab-help-btn" (click)="engine?.zoom(-0.1)">
+                <i class="bi bi-zoom-out"></i>
+              </button>
+              <button type="button" class="btn lab-help-btn" (click)="engine?.fit()">Ajustar</button>
+              <button type="button" class="btn lab-help-btn" (click)="engine?.zoom(0.1)">
+                <i class="bi bi-zoom-in"></i>
+              </button>
+            </div>
+            <span class="chip" [class.on]="yBit() === 1">Y = {{ yBit() }}</span>
+          </div>
+        </div>
+        <div class="joint-host compact" #host></div>
+      </section>
     </div>
   `,
 })
 export class KarnaughPage {
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly host = viewChild.required<ElementRef<HTMLElement>>('host');
   readonly vars = signal(4);
   readonly values = signal(new Map<number, CellValue>());
+  readonly form = signal<KMapForm>('sop');
+  readonly yBit = signal<0 | 1>(0);
   readonly layout = computed(() => this.withValues(buildLayout(this.vars())));
   readonly names = computed(() => VAR_NAMES.slice(0, this.vars()));
   readonly result = computed(() => minimize(this.vars(), this.values()));
+  readonly diagram = computed(() => diagramMinimized(this.vars(), this.result(), this.form()));
   readonly maps = computed(() => {
     const layout = this.layout();
     return Array.from({ length: layout.maps }, (_, index) => ({
@@ -96,6 +154,22 @@ export class KarnaughPage {
     }));
   });
   readonly rowIndexes = computed(() => Array.from({ length: this.layout().rows }, (_, i) => i));
+  engine?: CircuitEngine;
+
+  constructor() {
+    afterNextRender(() => {
+      this.engine = new CircuitEngine(this.host().nativeElement, {
+        onChange: () => this.yBit.set(this.engine?.snapshot().labels['Y'] ?? 0),
+      });
+      this.engine.loadNetlist(this.diagram());
+      this.destroyRef.onDestroy(() => this.engine?.destroy());
+    });
+
+    effect(() => {
+      const net = this.diagram();
+      untracked(() => this.engine?.loadNetlist(net));
+    });
+  }
 
   cellsOf(map: number, row: number) {
     return this.layout().cells.filter((c) => c.map === map && c.row === row);
@@ -108,6 +182,10 @@ export class KarnaughPage {
   setVars(n: number): void {
     this.vars.set(n);
     this.values.set(new Map());
+  }
+
+  setForm(form: KMapForm): void {
+    this.form.set(form);
   }
 
   toggle(minterm: number): void {

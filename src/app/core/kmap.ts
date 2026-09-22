@@ -1,4 +1,4 @@
-import type { CellValue } from './models';
+import type { CellValue, GateKind, Netlist, NetNode, NetWire } from './models';
 import { graySequence } from './logic';
 
 export const VAR_NAMES = ['A', 'B', 'C', 'D', 'E', 'F'] as const;
@@ -34,6 +34,16 @@ export interface MinimizedFunction {
   sop: string;
   pos: string;
   primes: PrimeImplicant[];
+  sopPrimes: PrimeImplicant[];
+  posPrimes: PrimeImplicant[];
+}
+
+export type KMapForm = 'sop' | 'pos';
+
+interface Literal {
+  name: string;
+  index: number;
+  complemented: boolean;
 }
 
 function bitsOf(n: number, width: number): string {
@@ -135,7 +145,8 @@ function termOf(pattern: string, vars: readonly string[], polarity: 'sop' | 'pos
     else parts.push(ch === '0' ? vars[i] : `${vars[i]}'`);
   }
   if (polarity === 'sop') return parts.length ? parts.join('') : '1';
-  return parts.length ? `(${parts.join('+')})` : '0';
+  if (!parts.length) return '0';
+  return parts.length === 1 ? parts[0] : `(${parts.join('+')})`;
 }
 
 function quineMcCluskey(variables: number, ones: number[], dontCares: number[]): PrimeImplicant[] {
@@ -222,27 +233,26 @@ export function minimize(variables: number, values: Map<number, CellValue>): Min
 
   const vars = VAR_NAMES.slice(0, variables);
   if (ones.length === 0) {
-    return { sop: '0', pos: zeros.length === 0 ? 'X' : '0', primes: [] };
+    return { sop: '0', pos: zeros.length === 0 ? 'X' : '0', primes: [], sopPrimes: [], posPrimes: [] };
   }
   if (ones.length + dontCares.length === max && ones.length > 0) {
-    return { sop: '1', pos: '1', primes: [{ pattern: '-'.repeat(variables), minterms: ones, essential: true }] };
+    const tautology = [{ pattern: '-'.repeat(variables), minterms: ones, essential: true }];
+    return { sop: '1', pos: '1', primes: tautology, sopPrimes: tautology, posPrimes: tautology };
   }
 
   const sopPrimes = quineMcCluskey(variables, ones, dontCares);
   const posPrimes = quineMcCluskey(variables, zeros, dontCares);
-  const sop = sopPrimes
-    .filter((p) => p.essential)
-    .map((p) => termOf(p.pattern, vars, 'sop'))
-    .join(' + ');
-  const pos = posPrimes
-    .filter((p) => p.essential)
-    .map((p) => termOf(p.pattern, vars, 'pos'))
-    .join('');
+  const sopEssential = sopPrimes.filter((p) => p.essential);
+  const posEssential = posPrimes.filter((p) => p.essential);
+  const sop = sopEssential.map((p) => termOf(p.pattern, vars, 'sop')).join(' + ');
+  const pos = posEssential.map((p) => termOf(p.pattern, vars, 'pos')).join('');
 
   return {
     sop: sop || '0',
     pos: pos || (zeros.length ? '1' : '0'),
-    primes: sopPrimes.filter((p) => p.essential),
+    primes: sopEssential,
+    sopPrimes: sopEssential,
+    posPrimes: posEssential,
   };
 }
 
@@ -250,4 +260,100 @@ export function cycleCell(value: CellValue): CellValue {
   if (value === 0) return 1;
   if (value === 1) return 'X';
   return 0;
+}
+
+function literalsOf(pattern: string, vars: readonly string[], form: KMapForm): Literal[] {
+  const literals: Literal[] = [];
+  for (let i = 0; i < pattern.length; i++) {
+    const ch = pattern[i];
+    if (ch === '-') continue;
+    const complemented = form === 'sop' ? ch === '0' : ch === '1';
+    literals.push({ name: vars[i], index: i, complemented });
+  }
+  return literals;
+}
+
+function constantNet(kind: 'VCC' | 'GND'): Netlist {
+  return {
+    nodes: [
+      { id: kind.toLowerCase(), kind, x: 80, y: 80, label: kind },
+      { id: 'Y', kind: 'OUT', x: 320, y: 80, label: 'Y' },
+    ],
+    wires: [{ from: kind.toLowerCase(), to: 'Y', fromPort: 'out', toPort: 'in1' }],
+  };
+}
+
+function sourceId(lit: Literal): string {
+  return lit.complemented ? `not_${lit.name}` : `in_${lit.name}`;
+}
+
+export function diagramMinimized(variables: number, result: MinimizedFunction, form: KMapForm): Netlist {
+  const expression = form === 'sop' ? result.sop : result.pos;
+  if (expression === 'X' || expression === '') return { nodes: [], wires: [] };
+  if (expression === '0') return constantNet('GND');
+  if (expression === '1') return constantNet('VCC');
+
+  const vars = VAR_NAMES.slice(0, variables);
+  const primes = form === 'sop' ? result.sopPrimes : result.posPrimes;
+  const terms = primes.map((p) => literalsOf(p.pattern, vars, form));
+  const used = [...new Set(terms.flatMap((term) => term.map((lit) => lit.index)))].sort((a, b) => a - b);
+  const nodes: NetNode[] = [];
+  const wires: NetWire[] = [];
+  const row = (i: number) => 20 + i * 66;
+
+  used.forEach((index, i) => {
+    const name = vars[index];
+    nodes.push({ id: `in_${name}`, kind: 'IN', x: 36, y: row(i), label: name });
+  });
+
+  const needsNot = new Set(terms.flatMap((term) => term.filter((lit) => lit.complemented).map((lit) => lit.index)));
+  used.forEach((index, i) => {
+    if (!needsNot.has(index)) return;
+    const name = vars[index];
+    nodes.push({ id: `not_${name}`, kind: 'NOT', x: 196, y: row(i), label: `${name}'` });
+    wires.push({ from: `in_${name}`, to: `not_${name}`, fromPort: 'out', toPort: 'in1' });
+  });
+
+  const termKind: GateKind = form === 'sop' ? 'AND' : 'OR';
+  const combineKind: GateKind = form === 'sop' ? 'OR' : 'AND';
+  const termIds: string[] = [];
+
+  terms.forEach((lits, t) => {
+    if (!lits.length) {
+      const id = form === 'sop' ? 'vcc' : 'gnd';
+      if (!nodes.some((n) => n.id === id)) {
+        nodes.push({ id, kind: form === 'sop' ? 'VCC' : 'GND', x: 196, y: 36, label: form === 'sop' ? 'VCC' : 'GND' });
+      }
+      termIds.push(id);
+      return;
+    }
+    if (lits.length === 1) {
+      termIds.push(sourceId(lits[0]));
+      return;
+    }
+    const id = `term_${t}`;
+    nodes.push({ id, kind: termKind, x: 380, y: row(t), label: termKind, inputs: lits.length });
+    lits.forEach((lit, li) => {
+      wires.push({ from: sourceId(lit), to: id, fromPort: 'out', toPort: `in${li + 1}` });
+    });
+    termIds.push(id);
+  });
+
+  if (!termIds.length) return { nodes, wires };
+
+  if (termIds.length === 1) {
+    const src = nodes.find((n) => n.id === termIds[0]);
+    nodes.push({ id: 'Y', kind: 'OUT', x: 580, y: src?.y ?? 36, label: 'Y' });
+    wires.push({ from: termIds[0], to: 'Y', fromPort: 'out', toPort: 'in1' });
+    return { nodes, wires };
+  }
+
+  const midY = row((termIds.length - 1) / 2);
+  nodes.push({ id: 'join', kind: combineKind, x: 580, y: midY, label: combineKind, inputs: termIds.length });
+  termIds.forEach((id, i) => {
+    wires.push({ from: id, to: 'join', fromPort: 'out', toPort: `in${i + 1}` });
+  });
+  nodes.push({ id: 'Y', kind: 'OUT', x: 760, y: midY, label: 'Y' });
+  wires.push({ from: 'join', to: 'Y', fromPort: 'out', toPort: 'in1' });
+  return { nodes, wires };
 }
