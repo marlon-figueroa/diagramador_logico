@@ -86,7 +86,7 @@ export interface IcDefinition {
 export interface FlipFlopForm {
   id: string;
   name: string;
-  family: 'latch' | 'flipflop';
+  family: 'latch' | 'flipflop' | 'clock';
   trigger: 'level' | 'rising' | 'falling' | 'async' | 'master-slave';
   description: string;
   inputs: string[];

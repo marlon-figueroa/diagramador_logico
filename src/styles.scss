@@ -290,6 +290,10 @@ h3,
   min-height: calc(100vh - 8rem);
 }
 
+.studio.studio-clock {
+  grid-template-columns: 260px minmax(0, 1fr);
+}
+
 .studio-side {
   padding: 1rem;
   overflow: auto;
@@ -479,6 +483,128 @@ h3,
   display: grid;
   gap: 0.15rem;
   font-family: 'IBM Plex Mono', monospace;
+}
+
+.clock-panel {
+  padding: 1rem 1rem 0;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.clock-start {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  align-items: end;
+}
+
+.clock-start label {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.78rem;
+  color: var(--lab-muted);
+}
+
+.clock-start input,
+.clock-start select {
+  width: 6.2rem;
+}
+
+.clock-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.clock-readout {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 1.15rem;
+  margin-left: auto;
+}
+
+.led-lamp,
+.led-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.led-lamp {
+  min-width: 5.4rem;
+  padding: 0.35rem 0.7rem;
+}
+
+.led-dot {
+  min-width: 1.7rem;
+  padding: 0.12rem 0.28rem;
+}
+
+.led-lamp.green,
+.led-dot.green,
+.seg.green,
+.clock-colon.green {
+  background: #16a34a;
+  color: #052e16;
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.55);
+}
+
+.led-lamp.red,
+.led-dot.red,
+.seg.red,
+.clock-colon.red {
+  background: #dc2626;
+  color: #fff5f5;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.35);
+  opacity: 0.55;
+}
+
+.clock-digits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  align-items: end;
+}
+
+.digit-block {
+  display: grid;
+  justify-items: center;
+  gap: 0.3rem;
+}
+
+.seg7 {
+  position: relative;
+  width: 52px;
+  height: 88px;
+}
+
+.seg {
+  position: absolute;
+  border-radius: 4px;
+}
+
+.seg.a { top: 2px; left: 10px; width: 32px; height: 8px; }
+.seg.d { bottom: 2px; left: 10px; width: 32px; height: 8px; }
+.seg.g { top: 40px; left: 10px; width: 32px; height: 8px; }
+.seg.b { top: 10px; right: 2px; width: 8px; height: 30px; }
+.seg.c { bottom: 10px; right: 2px; width: 8px; height: 30px; }
+.seg.f { top: 10px; left: 2px; width: 8px; height: 30px; }
+.seg.e { bottom: 10px; left: 2px; width: 8px; height: 30px; }
+
+.clock-colon {
+  font-size: 2rem;
+  font-weight: 800;
+  padding: 0 0.15rem 1.6rem;
+  border-radius: 8px;
+  line-height: 1;
+}
+
+.bcd-leds {
+  display: flex;
+  gap: 0.2rem;
 }
 
 [data-bs-theme='light'] .btn-outline-light {

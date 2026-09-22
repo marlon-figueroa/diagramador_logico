@@ -473,7 +473,76 @@ export const FLIPFLOPS: FlipFlopForm[] = [
     ],
     netlist: jkNet(),
   },
+  {
+    id: 'clock-12',
+    name: 'Reloj 12 horas',
+    family: 'clock',
+    trigger: 'rising',
+    description:
+      'Cadena de T flip-flops MOD-10/MOD-6/MOD-12. Arranca en hora, minutos y segundos. LED verde = 1, LED rojo = 0.',
+    inputs: ['CLK'],
+    equation: '↑1 Hz → sU→sT→mU→mT→H  (1–12 + AM/PM)',
+    nextQ: (q) => q,
+    characteristic: [
+      { inputs: { CLK: '↑' }, outputs: { sU: '+1' }, note: 'Unidades de segundo MOD10' },
+      { inputs: { sU: '9' }, outputs: { sT: '+1' }, note: 'Acarreo a decenas MOD6' },
+      { inputs: { MM: '59' }, outputs: { H: '+1' }, note: 'Acarreo a horas 1–12' },
+      { inputs: { H: '11' }, outputs: { AMPM: 'toggle' }, note: 'Cambio AM/PM al pasar a 12' },
+    ],
+    excitation: [
+      { inputs: { etapa: 'sU/mU' }, outputs: { T: 1 }, note: 'T-FF cuenta BCD' },
+      { inputs: { etapa: 'sT/mT' }, outputs: { T: 1 }, note: 'Reset en 6' },
+      { inputs: { etapa: 'H' }, outputs: { T: 1 }, note: 'Reset en 13 → 1' },
+    ],
+    netlist: clockNet(12),
+  },
+  {
+    id: 'clock-24',
+    name: 'Reloj 24 horas',
+    family: 'clock',
+    trigger: 'rising',
+    description:
+      'Cadena de T flip-flops MOD-10/MOD-6/MOD-24. Carga inicial HH:MM:SS y salidas LED verde/rojo por bit y segmento.',
+    inputs: ['CLK'],
+    equation: '↑1 Hz → sU→sT→mU→mT→H  (00–23)',
+    nextQ: (q) => q,
+    characteristic: [
+      { inputs: { CLK: '↑' }, outputs: { sU: '+1' }, note: 'Unidades de segundo MOD10' },
+      { inputs: { sU: '9' }, outputs: { sT: '+1' }, note: 'Acarreo a decenas MOD6' },
+      { inputs: { MM: '59' }, outputs: { H: '+1' }, note: 'Acarreo a horas 00–23' },
+      { inputs: { H: '23' }, outputs: { H: 0 }, note: 'Vuelta a 00:00:00' },
+    ],
+    excitation: [
+      { inputs: { etapa: 'sU/mU' }, outputs: { T: 1 }, note: 'T-FF cuenta BCD' },
+      { inputs: { etapa: 'sT/mT' }, outputs: { T: 1 }, note: 'Reset en 6' },
+      { inputs: { etapa: 'H' }, outputs: { T: 1 }, note: 'Reset en 24 → 00' },
+    ],
+    netlist: clockNet(24),
+  },
 ];
+
+function clockNet(hours: 12 | 24): Netlist {
+  const label = hours === 12 ? 'T MOD12 H' : 'T MOD24 H';
+  return {
+    nodes: [
+      { id: 'CLK', kind: 'CLK', x: 20, y: 140, label: 'CLK 1Hz' },
+      { id: 'SU', kind: 'FF', x: 170, y: 40, label: 'T MOD10 sU' },
+      { id: 'ST', kind: 'FF', x: 170, y: 180, label: 'T MOD6 sT' },
+      { id: 'MU', kind: 'FF', x: 340, y: 40, label: 'T MOD10 mU' },
+      { id: 'MT', kind: 'FF', x: 340, y: 180, label: 'T MOD6 mT' },
+      { id: 'HR', kind: 'FF', x: 520, y: 110, label },
+      { id: 'LED', kind: 'OUT', x: 700, y: 110, label: 'LED HH:MM:SS' },
+    ],
+    wires: [
+      pair('CLK', 'SU'),
+      pair('SU', 'ST'),
+      pair('ST', 'MU'),
+      pair('MU', 'MT'),
+      pair('MT', 'HR'),
+      pair('HR', 'LED'),
+    ],
+  };
+}
 
 export function findFlipFlop(id: string): FlipFlopForm {
   return FLIPFLOPS.find((ff) => ff.id === id) ?? FLIPFLOPS[0];

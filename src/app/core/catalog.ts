@@ -40,11 +40,11 @@ export const MENU: MenuItem[] = [
   {
     id: 'ff',
     title: 'Flip-flops',
-    subtitle: 'Latches y flip-flops SR, JK, D y T en todas sus formas',
+    subtitle: 'Latches y flip-flops SR, JK, D y T, más reloj 12/24 h con LEDs',
     icon: 'bi-arrow-repeat',
     route: '/flip-flops',
     accent: 'accent-rose',
-    topics: ['Latch / FF', 'Flanco y nivel', 'Preset/Clear', 'Tablas y estados'],
+    topics: ['Latch / FF', 'Flanco y nivel', 'Preset/Clear', 'Reloj 12/24 h'],
   },
 ];
 
