@@ -20,6 +20,10 @@
           <span>{{ item.title }}</span>
         </a>
       }
+      <a routerLink="/ayuda" routerLinkActive="active" class="lab-nav-link">
+        <i class="bi bi-question-circle"></i>
+        <span>Ayuda</span>
+      </a>
     </nav>
 
     <div class="lab-sidebar-foot">
@@ -49,10 +53,17 @@
       <div class="lab-topbar-meta">
         <span><i class="bi bi-bezier2"></i> Editor de CI</span>
         <span><i class="bi bi-lightning-charge"></i> Simulación en vivo</span>
+        <a routerLink="/ayuda" class="btn btn-sm lab-help-btn">
+          <i class="bi bi-question-circle"></i> Ayuda
+        </a>
       </div>
     </header>
     <main class="lab-content">
       <router-outlet />
     </main>
+    <footer class="lab-footer">
+      <p>Autor: <strong>Marlon E. Figueroa F.</strong></p>
+      <p>Diagramador lógico · Laboratorio digital</p>
+    </footer>
   </div>
 </div>

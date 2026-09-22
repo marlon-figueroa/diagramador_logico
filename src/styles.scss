@@ -181,6 +181,9 @@ h3,
 
 .lab-main {
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .lab-topbar {
@@ -212,6 +215,42 @@ h3,
 
 .lab-content {
   padding: 1rem 1.6rem 2rem;
+}
+
+.lab-footer {
+  margin-top: auto;
+  padding: 1rem 1.6rem 1.4rem;
+  border-top: 1px solid var(--lab-line);
+  color: var(--lab-muted);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.lab-footer p {
+  margin: 0;
+}
+
+.lab-help-btn {
+  color: var(--lab-stack);
+  border: 1px solid var(--lab-line);
+}
+
+.lab-help-btn:hover {
+  color: var(--lab-ink);
+  border-color: var(--lab-accent);
+  background: transparent;
+}
+
+.help-steps {
+  padding-left: 1.1rem;
+  color: var(--lab-stack);
+}
+
+.help-steps li {
+  margin-bottom: 0.4rem;
 }
 
 .lab-card {

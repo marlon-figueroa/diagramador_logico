@@ -1,4 +1,4 @@
-import type { MenuItem, PaletteItem } from './models';
+import type { MenuHelp, MenuItem, PaletteItem } from './models';
 
 export const MENU: MenuItem[] = [
   {
@@ -62,4 +62,93 @@ export const GATE_PALETTE: PaletteItem[] = [
   { kind: 'VCC', label: 'VCC (1)', icon: 'bi-plus-square' },
   { kind: 'GND', label: 'GND (0)', icon: 'bi-dash-square' },
   { kind: 'CLK', label: 'Clock', icon: 'bi-clock' },
+];
+
+export const MENU_HELP: MenuHelp[] = [
+  {
+    id: 'index',
+    title: 'Índice',
+    icon: 'bi-house-door',
+    route: '/',
+    summary: 'Página de inicio. Muestra el menú completo de diagramadores como tarjetas.',
+    steps: [
+      'Entra por Índice o el logo para volver al listado.',
+      'Cada tarjeta abre una estación: compuertas, Karnaugh, MSI, componentes o flip-flops.',
+      'Usa el menú izquierdo para cambiar de herramienta sin perder el contexto del laboratorio.',
+    ],
+  },
+  {
+    id: 'gates',
+    title: 'Compuertas lógicas básicas',
+    icon: 'bi-diagram-3',
+    route: '/compuertas',
+    summary: 'Lienzo IEEE para dibujar y simular AND, OR, NOT, NAND, NOR, XOR, XNOR y buffer.',
+    steps: [
+      'Elige un símbolo en la paleta para colocarlo en el lienzo JointJS.',
+      'Arrastra desde un pin de salida (derecha) hacia un pin de entrada (izquierda).',
+      'Haz clic en una entrada o clock para conmutar 0/1. El cable verde es lógico 1.',
+      'Carga un ejemplo (XOR con NAND o sumador medio) o limpia el lienzo.',
+    ],
+  },
+  {
+    id: 'kmap',
+    title: 'Mapas de Karnaugh',
+    icon: 'bi-grid-3x3-gap',
+    route: '/karnaugh',
+    summary: 'Minimiza funciones booleanas de 2 a 6 variables en SOP y POS.',
+    steps: [
+      'Selecciona el número de variables (2 a 6).',
+      'Clic en una celda para ciclar 0 → 1 → X (don’t care).',
+      'Usa Todo 0, Todo 1 o Don’t care para rellenar el mapa.',
+      'Lee la expresión SOP/POS y los implicantes primos esenciales.',
+    ],
+  },
+  {
+    id: 'msi',
+    title: 'Circuitos MSI',
+    icon: 'bi-cpu',
+    route: '/msi',
+    summary: 'Biblioteca 74xx: sumadores, restadores, comparadores, códigos, MUX, paridad y ALU.',
+    steps: [
+      'Filtra por familia o elige un circuito en la lista.',
+      'Conmuta los pines de entrada; las salidas se recalculan al instante.',
+      'Cambia entre Bloque CI y Nivel compuerta para ver el netlist interno.',
+    ],
+  },
+  {
+    id: 'components',
+    title: 'Decodificador y multiplexor',
+    icon: 'bi-collection',
+    route: '/componentes',
+    summary: 'Configura decodificadores 2-4 / 3-8 / 4-16, MUX 2:1 a 16:1 y demultiplexores.',
+    steps: [
+      'Elige el componente y el tamaño en la lista izquierda.',
+      'Activa o desactiva Enable y salidas activas en bajo.',
+      'Cambia los bits de selección S y los datos D para ver Yn en vivo.',
+    ],
+  },
+  {
+    id: 'ff',
+    title: 'Flip-flops',
+    icon: 'bi-arrow-repeat',
+    route: '/flip-flops',
+    summary: 'Latches y FF SR, JK, D y T, más relojes de 12 y 24 horas con LEDs.',
+    steps: [
+      'Selecciona una forma: latch, flanco, maestro-esclavo o preset/clear.',
+      'Conmuta entradas y usa Pulso CLK para ver Q y Q′.',
+      'En Reloj 12/24 h carga hora, minutos y segundos y pulsa Start.',
+      'LED verde = 1 y LED rojo = 0 en segmentos, bits BCD, RUN/STOP y AM/PM.',
+    ],
+  },
+  {
+    id: 'theme',
+    title: 'Modo claro y oscuro',
+    icon: 'bi-circle-half',
+    summary: 'El conmutador de tema está al pie del menú izquierdo.',
+    steps: [
+      'Pulsa Modo claro u Modo oscuro según el tema actual.',
+      'La preferencia se guarda en el navegador.',
+      'El lienzo JointJS también cambia fondo, grilla y etiquetas.',
+    ],
+  },
 ];

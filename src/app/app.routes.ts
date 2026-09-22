@@ -36,6 +36,11 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/flipflops/flipflops').then((m) => m.FlipflopsPage),
         title: 'Flip-flops',
       },
+      {
+        path: 'ayuda',
+        loadComponent: () => import('./pages/ayuda/ayuda').then((m) => m.AyudaPage),
+        title: 'Ayuda · Diagramador lógico',
+      },
     ],
   },
   { path: '**', redirectTo: '' },

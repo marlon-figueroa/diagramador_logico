@@ -28,6 +28,15 @@ export interface MenuItem {
   topics: string[];
 }
 
+export interface MenuHelp {
+  id: string;
+  title: string;
+  icon: string;
+  route?: string;
+  summary: string;
+  steps: string[];
+}
+
 export interface PaletteItem {
   kind: GateKind;
   label: string;

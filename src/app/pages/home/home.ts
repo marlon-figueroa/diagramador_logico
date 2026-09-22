@@ -11,11 +11,14 @@ import { MENU } from '../../core/catalog';
         <div class="col-lg-7">
           <p class="lab-kicker">Índice del laboratorio</p>
           <h2 class="display-6 fw-semibold mb-3">Todos los diagramadores en un solo menú</h2>
-          <p class="lead text-secondary mb-0">
+          <p class="lead text-secondary mb-3">
             Diseña compuertas IEEE, minimiza funciones con mapas de Karnaugh de 2 a 6 variables,
             inspecciona circuitos MSI 74xx, configura decodificadores y multiplexores, y recorre
             todas las formas de latches y flip-flops.
           </p>
+          <a class="btn btn-sm lab-help-btn" routerLink="/ayuda">
+            <i class="bi bi-question-circle"></i> Cómo usar el menú
+          </a>
         </div>
         <div class="col-lg-5">
           <ul class="list-unstyled home-stack mb-0">
