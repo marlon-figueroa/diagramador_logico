@@ -1,0 +1,58 @@
+<div class="lab-shell">
+  <aside class="lab-sidebar">
+    <a class="lab-brand" routerLink="/">
+      <span class="lab-brand-mark"><i class="bi bi-cpu-fill"></i></span>
+      <span>
+        <strong>Diagramador lógico</strong>
+        <small>Laboratorio digital</small>
+      </span>
+    </a>
+
+    <p class="lab-nav-label">Menú de diagramadores</p>
+    <nav class="lab-nav">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="lab-nav-link">
+        <i class="bi bi-house-door"></i>
+        <span>Índice</span>
+      </a>
+      @for (item of menu; track item.id) {
+        <a [routerLink]="item.route" routerLinkActive="active" class="lab-nav-link">
+          <i class="bi" [class]="item.icon"></i>
+          <span>{{ item.title }}</span>
+        </a>
+      }
+    </nav>
+
+    <div class="lab-sidebar-foot">
+      <button type="button" class="theme-toggle" (click)="theme.toggle()">
+        @if (theme.theme() === 'dark') {
+          <i class="bi bi-sun"></i>
+          <span>Modo claro</span>
+        } @else {
+          <i class="bi bi-moon-stars"></i>
+          <span>Modo oscuro</span>
+        }
+      </button>
+      <div class="d-flex flex-wrap gap-1">
+        <span class="badge text-bg-secondary">Angular 22</span>
+        <span class="badge text-bg-secondary">Bootstrap 5.3</span>
+        <span class="badge text-bg-secondary">JointJS 4.3</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="lab-main">
+    <header class="lab-topbar">
+      <div>
+        <p class="lab-kicker">Circuitos integrados · MSI · Secuenciales</p>
+        <h1>Estación de diseño digital</h1>
+      </div>
+      <div class="lab-topbar-meta">
+        <span><i class="bi bi-bezier2"></i> Editor de CI</span>
+        <span><i class="bi bi-lightning-charge"></i> Simulación en vivo</span>
+      </div>
+    </header>
+    <main class="lab-content">
+      <router-outlet />
+    </main>
+  </div>
+</div>

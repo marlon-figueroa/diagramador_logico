@@ -1,0 +1,65 @@
+import type { MenuItem, PaletteItem } from './models';
+
+export const MENU: MenuItem[] = [
+  {
+    id: 'gates',
+    title: 'Compuertas lógicas básicas',
+    subtitle: 'AND, OR, NOT, NAND, NOR, XOR, XNOR y buffer con simulación en vivo',
+    icon: 'bi-diagram-3',
+    route: '/compuertas',
+    accent: 'accent-teal',
+    topics: ['IEEE/ANSI', 'Simulación', 'Netlist JointJS', 'Ejemplos'],
+  },
+  {
+    id: 'kmap',
+    title: 'Mapas de Karnaugh',
+    subtitle: 'Minimización SOP/POS desde 2 hasta 6 variables',
+    icon: 'bi-grid-3x3-gap',
+    route: '/karnaugh',
+    accent: 'accent-amber',
+    topics: ['2–6 variables', 'Don’t care', 'Quine-McCluskey', 'Agrupaciones'],
+  },
+  {
+    id: 'msi',
+    title: 'Circuitos MSI',
+    subtitle: 'Sumadores, restadores, comparadores, codificadores, paridad y ALU',
+    icon: 'bi-cpu',
+    route: '/msi',
+    accent: 'accent-violet',
+    topics: ['TTL 74xx', 'Nivel compuerta', 'Bloque CI', 'Tabla de verdad'],
+  },
+  {
+    id: 'components',
+    title: 'Decodificador y multiplexor',
+    subtitle: 'Diagramador de componentes MSI con pines, habilitación y lógica interna',
+    icon: 'bi-collection',
+    route: '/componentes',
+    accent: 'accent-sky',
+    topics: ['2-4 / 3-8 / 4-16', '2:1 a 16:1', 'Demux', 'Activo alto/bajo'],
+  },
+  {
+    id: 'ff',
+    title: 'Flip-flops',
+    subtitle: 'Latches y flip-flops SR, JK, D y T en todas sus formas',
+    icon: 'bi-arrow-repeat',
+    route: '/flip-flops',
+    accent: 'accent-rose',
+    topics: ['Latch / FF', 'Flanco y nivel', 'Preset/Clear', 'Tablas y estados'],
+  },
+];
+
+export const GATE_PALETTE: PaletteItem[] = [
+  { kind: 'IN', label: 'Entrada', icon: 'bi-toggle-on' },
+  { kind: 'OUT', label: 'Salida', icon: 'bi-lightbulb' },
+  { kind: 'AND', label: 'AND', inputs: 2, icon: 'bi-intersect' },
+  { kind: 'OR', label: 'OR', inputs: 2, icon: 'bi-union' },
+  { kind: 'NOT', label: 'NOT', inputs: 1, icon: 'bi-slash-circle' },
+  { kind: 'NAND', label: 'NAND', inputs: 2, icon: 'bi-intersect' },
+  { kind: 'NOR', label: 'NOR', inputs: 2, icon: 'bi-union' },
+  { kind: 'XOR', label: 'XOR', inputs: 2, icon: 'bi-symmetry-horizontal' },
+  { kind: 'XNOR', label: 'XNOR', inputs: 2, icon: 'bi-symmetry-horizontal' },
+  { kind: 'BUF', label: 'Buffer', inputs: 1, icon: 'bi-play' },
+  { kind: 'VCC', label: 'VCC (1)', icon: 'bi-plus-square' },
+  { kind: 'GND', label: 'GND (0)', icon: 'bi-dash-square' },
+  { kind: 'CLK', label: 'Clock', icon: 'bi-clock' },
+];
